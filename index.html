@@ -13,7 +13,6 @@
             --text-main: #ffffff;
             --text-dim: #a1a1aa;
             --border: #27272a;
-            /* Update to a brighter red */
             --danger-red: #ff453a; 
         }
 
@@ -60,13 +59,19 @@
         .search-input { flex: 1; background: transparent; border: none; padding: 14px 0; color: white; outline: none; margin-left: 10px; }
         
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        
+        /* PIL STYLE DENGAN COUNTER */
         .pill { 
             background: #1a1a1a; border: 1px solid var(--border); color: var(--text-dim); 
-            padding: 8px 20px; border-radius: 25px; white-space: nowrap; cursor: pointer;
+            padding: 8px 16px; border-radius: 25px; white-space: nowrap; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; font-size: 14px; transition: 0.2s;
         }
-        .pill.active { background: var(--accent); color: white; }
+        .pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .pill span { 
+            background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700;
+        }
+        .pill.active span { background: rgba(0,0,0,0.2); }
 
-        /* ANIMASI */
         .note-item { 
             background: var(--bg-card); border-radius: 22px; padding: 20px; margin-bottom: 15px; 
             border: 1px solid var(--border); position: relative;
@@ -79,11 +84,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* EFEK GESER KIRI SAAT HAPUS */
-        .note-item.removing {
-            transform: translateX(-120%);
-            opacity: 0;
-        }
+        .note-item.removing { transform: translateX(-120%); opacity: 0; }
 
         .badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
         .note-content { font-size: 17px; color: #fff; line-height: 1.5; word-wrap: break-word; }
@@ -92,10 +93,8 @@
         .note-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 12px; }
         .act-icon { color: #666; cursor: pointer; background: none; border: none; transition: 0.2s; }
         .act-icon:active { transform: scale(0.8); }
-        /* Target the delete button specifically to be bright red */
         .act-icon.del { color: var(--danger-red); }
 
-        /* Toast Notification */
         #toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: var(--accent); color: white; padding: 10px 20px;
@@ -138,12 +137,7 @@
             <input type="text" class="search-input" id="searchBar" placeholder="Cari catatan..." oninput="renderNotes()">
         </div>
 
-        <div class="filter-bar" id="filterBar">
-            <div class="pill active" onclick="setFilter('Semua')">Semua <span id="countAll">0</span></div>
-            <div class="pill" onclick="setFilter('Personal')">Personal</div>
-            <div class="pill" onclick="setFilter('Work')">Work</div>
-            <div class="pill" onclick="setFilter('Secret')">Secret</div>
-        </div>
+        <div class="filter-bar" id="filterBar"></div>
 
         <div id="notesList"></div>
     </div>
@@ -168,10 +162,6 @@
 
         function setFilter(f) {
             currentFilter = f;
-            document.querySelectorAll('#filterBar .pill').forEach(btn => {
-                const text = btn.innerText.split(' ')[0];
-                btn.classList.toggle('active', text === f);
-            });
             renderNotes();
         }
 
@@ -200,33 +190,51 @@
 
         function renderNotes() {
             const list = document.getElementById('notesList');
+            const filterBar = document.getElementById('filterBar');
             const search = document.getElementById('searchBar').value.toLowerCase();
-            document.getElementById('countAll').innerText = notes.length;
             
+            // RENDER FILTER BAR DENGAN COUNTER
+            const categories = ['Semua', 'Personal', 'Work', 'Secret'];
+            filterBar.innerHTML = categories.map(cat => {
+                const count = (cat === 'Semua') 
+                    ? notes.length 
+                    : notes.filter(n => n.category === cat).length;
+                
+                return `
+                <div class="pill ${currentFilter === cat ? 'active' : ''}" onclick="setFilter('${cat}')">
+                    ${cat} <span>${count}</span>
+                </div>`;
+            }).join('');
+
+            // FILTER LOGIC
             const filtered = notes.filter(n => {
                 const matchCat = currentFilter === 'Semua' || n.category === currentFilter;
                 return matchCat && n.content.toLowerCase().includes(search);
             }).reverse();
 
-            list.innerHTML = filtered.map(n => {
-                const config = {
-                    Personal: { bg: '#2d1b4e', txt: '#a78bfa' },
-                    Work: { bg: '#3e2b0e', txt: '#fbbf24' },
-                    Secret: { bg: '#3e1616', txt: '#f87171' }
-                }[n.category];
-                
-                return `
-                <div class="note-item" id="note-${n.id}">
-                    <span class="badge" style="background:${config.bg}; color:${config.txt}">${n.category}</span>
-                    <div class="note-actions">
-                        <button class="act-icon" onclick="editNote(${n.id})"><i data-lucide="edit-3" size="18"></i></button>
-                        <button class="act-icon" onclick="copyNote(${n.id})"><i data-lucide="copy" size="18"></i></button>
-                        <button class="act-icon del" onclick="confirmDelete(${n.id})"><i data-lucide="trash-2" size="18"></i></button>
-                    </div>
-                    <div class="note-content">${n.content.replace(/\n/g, '<br>')}</div>
-                    <div class="note-date">${n.date}</div>
-                </div>`;
-            }).join('');
+            if (filtered.length === 0) {
+                list.innerHTML = `<div style="text-align:center; color:#555; margin-top:40px; font-size:14px;">kosong, Bro kayak hati ini.</div>`;
+            } else {
+                list.innerHTML = filtered.map(n => {
+                    const config = {
+                        Personal: { bg: '#2d1b4e', txt: '#a78bfa' },
+                        Work: { bg: '#3e2b0e', txt: '#fbbf24' },
+                        Secret: { bg: '#3e1616', txt: '#f87171' }
+                    }[n.category];
+                    
+                    return `
+                    <div class="note-item" id="note-${n.id}">
+                        <span class="badge" style="background:${config.bg}; color:${config.txt}">${n.category}</span>
+                        <div class="note-actions">
+                            <button class="act-icon" onclick="editNote(${n.id})"><i data-lucide="edit-3" size="18"></i></button>
+                            <button class="act-icon" onclick="copyNote(${n.id})"><i data-lucide="copy" size="18"></i></button>
+                            <button class="act-icon del" onclick="confirmDelete(${n.id})"><i data-lucide="trash-2" size="18"></i></button>
+                        </div>
+                        <div class="note-content">${n.content.replace(/\n/g, '<br>')}</div>
+                        <div class="note-date">${n.date}</div>
+                    </div>`;
+                }).join('');
+            }
             lucide.createIcons();
         }
 
@@ -239,7 +247,6 @@
             document.getElementById('btnSave').innerText = 'Update';
             window.scrollTo({top: 0, behavior: 'smooth'});
             
-            // Sync category tab
             const tabs = document.querySelectorAll('#inputTabs .tab-btn');
             tabs.forEach(t => {
                 if(t.innerText === n.category) setCategory(t, n.category);
@@ -256,13 +263,12 @@
 
         function confirmDelete(id) {
             const el = document.getElementById(`note-${id}`);
-            el.classList.add('removing'); // Triggers slide-left animation
-            
+            el.classList.add('removing');
             setTimeout(() => {
                 notes = notes.filter(n => n.id !== id);
                 saveToStorage();
                 renderNotes();
-            }, 400); // Sesuai durasi transisi CSS
+            }, 400);
         }
 
         function saveToStorage() { localStorage.setItem('notes_db', JSON.stringify(notes)); }
@@ -284,7 +290,7 @@
                     if(Array.isArray(data)) {
                         notes = data;
                         saveToStorage(); renderNotes();
-                        alert('Data berhasil di-restore!');
+                        alert('Data di-restore!');
                     }
                 } catch(err) { alert('File gak valid!'); }
             };
