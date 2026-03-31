@@ -3,445 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyNotes - Premium Log</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>MyNotes Pro - Fixed</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-dark: #000000;
-            --surface: #1C1C1E;
-            --surface-hover: #2C2C2E;
-            --surface-light: #3A3A3C;
-            --text: #FFFFFF;
-            --text-secondary: #EBEBF5;
-            --muted: #8E8E93;
-            --primary: #0A84FF;
-            --primary-glow: rgba(10, 132, 255, 0.3);
-            --personal: #5E5CE6;
-            --work: #FF9F0A;
-            --secret: #FF453A;
-            --border-radius: 20px;
+            --bg-body: #000000;
+            --bg-card: #121212;
+            --accent: #007aff; 
+            --text-main: #ffffff;
+            --text-dim: #a1a1aa;
+            --border: #27272a;
+            --danger-red: #b91c1c; 
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-body); color: var(--text-main); padding: 15px; }
+        .container { max-width: 450px; margin: 0 auto; }
 
-        body {
-            font-family: '-apple-system', 'SF Pro Text', 'Inter', system-ui, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text);
-            line-height: 1.5;
-            padding-bottom: 110px;
-            min-height: 100vh;
-            overflow-x: hidden;
-            letter-spacing: -0.01em;
-        }
-
-        @keyframes popInFade {
-            0% { opacity: 0; transform: translateY(15px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes slideOutRight {
-            0% { opacity: 1; transform: translateX(0); }
-            100% { opacity: 0; transform: translateX(100px); }
-        }
-
-        header {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .header-btns button {
-            background: var(--surface);
-            color: var(--text);
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
+        /* --- FIX HEADER --- */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px; }
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+        .head-btns { display: flex; gap: 8px; }
+        
+        .icon-btn-head { 
+            background: #1a1a1a; border: 1px solid var(--border); width: 40px; height: 40px; 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            color: white; cursor: pointer; position: relative; overflow: hidden;
             transition: 0.2s;
         }
+        .icon-btn-head input { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .icon-btn-head:active { transform: scale(0.9); background: #222; }
 
-        .composer {
-            background: var(--surface);
-            margin: 20px 16px;
-            border-radius: var(--border-radius);
-            padding: 18px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        /* INPUT CARD */
+        .input-card { 
+            background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 25px; 
+            border: 2px solid var(--accent); transition: 0.3s;
         }
-
-        .composer:focus-within {
-            box-shadow: 0 0 0 2px var(--primary);
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { 
+            background: #262626; border: none; color: #888; padding: 8px 18px; 
+            border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
         }
+        .tab-btn.active { background: var(--accent); color: white; }
 
-        .comp-top { display: flex; gap: 8px; margin-bottom: 12px; }
-
-        .chip {
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            background: var(--surface-light);
-            color: var(--text-secondary);
-            transition: 0.2s ease;
+        textarea { 
+            background: transparent; border: none; width: 100%; height: 80px; 
+            color: white; font-size: 18px; outline: none; resize: none;
         }
+        
+        .input-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 10px;}
+        .char-hint { font-size: 12px; color: #555; }
+        .save-btn { background: var(--accent); color: white; border: none; padding: 10px 28px; border-radius: 22px; font-weight: 700; cursor: pointer; }
 
-        .chip.active {
-            background: var(--primary);
-            color: white;
+        /* SEARCH BOX */
+        .search-box { 
+            background: var(--bg-card); border-radius: 18px; display: flex; align-items: center; 
+            padding: 0 15px; margin-bottom: 20px; border: 1px solid var(--accent); /* Warna biru biar sinkron */
         }
-
-        textarea {
-            width: 100%;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text);
-            font-size: 15px;
-            min-height: 70px;
-            resize: none;
-            line-height: 1.6;
+        .search-input { flex: 1; background: transparent; border: none; padding: 14px 0; color: white; outline: none; margin-left: 10px; font-size: 15px; }
+        
+        /* FILTER BAR */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .pill { 
+            background: #1a1a1a; border: 1px solid var(--border); color: var(--text-dim); 
+            padding: 10px 22px; border-radius: 25px; white-space: nowrap; font-size: 14px; font-weight: 600; 
         }
+        .pill.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
+        /* LIST NOTE ANIMATION */
+        .note-item { 
+            background: var(--bg-card); border-radius: 22px; padding: 20px; margin-bottom: 15px; border: 1px solid var(--border);
+            position: relative; animation: slideUp 0.4s ease-out forwards;
         }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .search-box { margin: 0 16px 16px; position: relative; }
-        .search-box input {
-            width: 100%;
-            background: var(--surface);
-            border: none;
-            padding: 14px 16px 14px 40px;
-            border-radius: 16px;
-            color: var(--text);
-        }
+        .badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
+        .note-content { font-size: 18px; color: #fff; font-weight: 500; line-height: 1.4; }
+        .note-date { font-size: 12px; color: #444; margin-top: 12px; }
 
-        .filters {
-            padding: 0 16px 16px;
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            background: var(--surface);
-            color: var(--muted);
-            border-radius: 30px;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .filter-btn.active { background: var(--text); color: var(--bg-dark); }
-
-        .note-card {
-            background: var(--surface);
-            border-radius: var(--border-radius);
-            padding: 18px;
-            margin: 0 16px 12px;
-            position: relative;
-            animation: popInFade 0.4s forwards;
-        }
-
-        .note-category {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 4px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .note-personal { color: var(--personal); background: rgba(94, 92, 230, 0.1); }
-        .note-work     { color: var(--work); background: rgba(255, 159, 10, 0.1); }
-        .note-secret   { color: var(--secret); background: rgba(255, 69, 58, 0.1); }
-
-        .note-actions {
-            position: absolute; top: 18px; right: 18px;
-            display: flex; gap: 14px; color: var(--muted);
-        }
-
-        .note-actions i { cursor: pointer; font-size: 16px; }
-
-        .bottom-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(28, 28, 30, 0.9);
-            backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around;
-            padding: 12px 0 28px;
-            z-index: 100;
-        }
-
-        .nav-item { text-align: center; color: var(--muted); font-size: 11px; width: 60px; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 22px; margin-bottom: 4px; display: block; }
-
-        .toast {
-            position: fixed; bottom: 100px; left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--text); color: var(--bg-dark);
-            padding: 12px 24px; border-radius: 30px;
-            font-weight: 600; opacity: 0; transition: 0.3s; z-index: 2000;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* Modal Stats */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
-        }
-        .modal-content { background: var(--surface); width: 90%; max-width: 360px; border-radius: 24px; padding: 24px; }
+        .note-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 15px; }
+        .act-icon { color: #666; cursor: pointer; background: none; border: none; }
+        .act-icon.del { color: var(--danger-red); }
     </style>
 </head>
 <body>
 
-    <header>
-        <div>MyNotes</div>
-        <div class="header-btns" style="display:flex; gap:8px;">
-            <button onclick="showStats()"><i class="fas fa-chart-pie"></i></button>
-            <button onclick="exportData()"><i class="fas fa-file-export"></i></button>
-        </div>
-    </header>
+    <div class="container">
+        <header>
+            <div class="logo">MyNotes</div>
+            <div class="head-btns">
+                <button class="icon-btn-head" onclick="backupData()"><i data-lucide="upload-cloud" size="20"></i></button>
+                <div class="icon-btn-head">
+                    <i data-lucide="download-cloud" size="20"></i>
+                    <input type="file" onchange="restoreData(event)">
+                </div>
+            </div>
+        </header>
 
-    <div class="composer" id="main-composer">
-        <div class="comp-top">
-            <div class="chip active" data-cat="Personal" onclick="selectCategory(this)">Personal</div>
-            <div class="chip" data-cat="Work" onclick="selectCategory(this)">Work</div>
-            <div class="chip" data-cat="Secret" onclick="selectCategory(this)">Secret</div>
-        </div>
-        <textarea id="note-txt" placeholder="Ketik sesuatu..." oninput="autoResize(this)"></textarea>
-        <div class="composer-foot" style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; border-top:1px solid rgba(255,255,255,0.05); padding-top:12px;">
-            <span id="char-ct" style="font-size:12px; color:var(--muted)">0 karakter</span>
-            <button class="btn-primary" id="save-btn" onclick="saveEntry()">Simpan</button>
-        </div>
-    </div>
-
-    <div class="search-box">
-        <i class="fas fa-search" style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--muted);"></i>
-        <input type="text" id="search-in" placeholder="Cari data..." oninput="renderLogs()">
-    </div>
-
-    <div class="filters">
-        <div class="filter-btn active" data-f="All" onclick="setFilter(this)">Semua <span id="count-all">0</span></div>
-        <div class="filter-btn" data-f="Personal" onclick="setFilter(this)">Personal</div>
-        <div class="filter-btn" data-f="Work" onclick="setFilter(this)">Work</div>
-        <div class="filter-btn" data-f="Secret" onclick="setFilter(this)">Secret</div>
-    </div>
-
-    <div id="logs-list"></div>
-
-    <div class="bottom-bar">
-        <div class="nav-item active"><i class="fas fa-layer-group"></i><div>Vault</div></div>
-        <div class="nav-item" onclick="document.getElementById('import-file').click()"><i class="fas fa-cloud-download-alt"></i><div>Restore</div></div>
-    </div>
-
-    <input type="file" id="import-file" style="display:none" onchange="importData(event)">
-    <div id="toast" class="toast"></div>
-
-    <div class="modal" id="stats-modal" onclick="if(event.target==this) closeStats()">
-        <div class="modal-content">
-            <h3 style="text-align:center; margin-bottom:15px;">Vault Status</h3>
-            <p>Total Catatan: <b id="stat-total">0</b></p>
-            <p>Ukuran Data: <b id="stat-size">0 KB</b></p>
-            <div style="margin-top:20px; display:flex; gap:10px;">
-                <button class="btn-primary" onclick="clearAll()" style="flex:1; background:#FF453A;">Format</button>
-                <button class="btn-primary" onclick="closeStats()" style="flex:1;">Tutup</button>
+        <div class="input-card">
+            <div class="tabs" id="inputTabs">
+                <button class="tab-btn active" onclick="setCategory(this, 'Personal')">Personal</button>
+                <button class="tab-btn" onclick="setCategory(this, 'Work')">Work</button>
+                <button class="tab-btn" onclick="setCategory(this, 'Secret')">Secret</button>
+            </div>
+            <textarea id="noteInput" placeholder="Ketik sesuatu..."></textarea>
+            <div class="input-footer">
+                <span class="char-hint" id="charCount">0 karakter</span>
+                <button class="save-btn" onclick="saveNote()" id="btnSave">Simpan</button>
             </div>
         </div>
+
+        <div class="search-box">
+            <i data-lucide="search" size="18" color="#555"></i>
+            <input type="text" class="search-input" id="searchBar" placeholder="Cari data..." oninput="renderNotes()">
+        </div>
+
+        <div class="filter-bar" id="filterBar">
+            <div class="pill active" onclick="setFilter('Semua')">Semua <span id="countAll" style="font-size:11px; opacity:0.7">0</span></div>
+            <div class="pill" onclick="setFilter('Personal')">Personal</div>
+            <div class="pill" onclick="setFilter('Work')">Work</div>
+            <div class="pill" onclick="setFilter('Secret')">Secret</div>
+        </div>
+
+        <div id="notesList"></div>
     </div>
 
-<script>
-const DB_NAME = "indigo_vault_db";
-let currentFilter = "All";
-let currentCategory = "Personal";
-let editId = null; // Penanda mode edit
+    <script>
+        let notes = JSON.parse(localStorage.getItem('notes_db') || '[]');
+        let currentCategory = 'Personal';
+        let currentFilter = 'Semua';
+        let editingId = null;
 
-const getDB = () => JSON.parse(localStorage.getItem(DB_NAME) || "[]");
-const saveDB = (data) => localStorage.setItem(DB_NAME, JSON.stringify(data));
-function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 4); }
+        lucide.createIcons();
+        document.getElementById('noteInput').oninput = function() {
+            document.getElementById('charCount').innerText = `${this.value.length} karakter`;
+        };
 
-function selectCategory(el) {
-    document.querySelectorAll('.comp-top .chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    currentCategory = el.dataset.cat;
-}
+        function setCategory(el, cat) {
+            currentCategory = cat;
+            document.querySelectorAll('#inputTabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+        }
 
-function autoResize(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
-    document.getElementById('char-ct').textContent = `${textarea.value.length} karakter`;
-}
+        function setFilter(f) {
+            currentFilter = f;
+            document.querySelectorAll('#filterBar .pill').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.includes(f));
+            });
+            renderNotes();
+        }
 
-// FUNGSI UTAMA: Save & Update
-function saveEntry() {
-    const ta = document.getElementById("note-txt");
-    const txt = ta.value.trim();
-    if (!txt) return;
-
-    let db = getDB();
-
-    if (editId) {
-        // Logika UPDATE
-        db = db.map(item => {
-            if (item.id === editId) {
-                return { ...item, content: txt, cat: currentCategory, ts: Date.now() };
+        function saveNote() {
+            const content = document.getElementById('noteInput').value.trim();
+            if (!content) return;
+            if (editingId) {
+                const idx = notes.findIndex(n => n.id === editingId);
+                notes[idx].content = content;
+                notes[idx].category = currentCategory;
+                editingId = null;
+                document.getElementById('btnSave').innerText = 'Simpan';
+            } else {
+                const now = new Date();
+                const timeStr = now.toLocaleDateString('id-ID', {day:'numeric', month:'short'}) + `, ${now.getHours()}.${now.getMinutes().toString().padStart(2,'0')}`;
+                notes.push({ id: Date.now(), content, category: currentCategory, date: timeStr });
             }
-            return item;
-        });
-        toast("Catatan diperbarui");
-        editId = null; 
-        document.getElementById("save-btn").textContent = "Simpan";
-    } else {
-        // Logika SAVE BARU
-        db.unshift({
-            id: uid(),
-            content: txt,
-            cat: currentCategory,
-            ts: Date.now(),
-            time: new Date().toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-        });
-        toast("Tersimpan di vault");
-    }
+            document.getElementById('noteInput').value = '';
+            document.getElementById('charCount').innerText = '0 karakter';
+            saveToStorage(); renderNotes();
+        }
 
-    saveDB(db);
-    ta.value = "";
-    ta.style.height = 'auto';
-    renderLogs();
-    updateCounters();
-}
+        function renderNotes() {
+            const list = document.getElementById('notesList');
+            const search = document.getElementById('searchBar').value.toLowerCase();
+            document.getElementById('countAll').innerText = notes.length;
+            
+            const filtered = notes.filter(n => {
+                const matchCat = currentFilter === 'Semua' || n.category === currentFilter;
+                return matchCat && n.content.toLowerCase().includes(search);
+            }).reverse();
 
-// FUNGSI EDIT: Narik data ke atas
-function editEntry(id) {
-    const db = getDB();
-    const item = db.find(x => x.id === id);
-    if (!item) return;
+            list.innerHTML = filtered.map(n => {
+                const badgeColor = n.category === 'Personal' ? '#2d1b4e' : (n.category === 'Work' ? '#3e2b0e' : '#3e1616');
+                const textColor = n.category === 'Personal' ? '#a78bfa' : (n.category === 'Work' ? '#fbbf24' : '#f87171');
+                
+                return `
+                <div class="note-item">
+                    <span class="badge" style="background:${badgeColor}; color:${textColor}">${n.category}</span>
+                    <div class="note-actions">
+                        <button class="act-icon" onclick="editNote(${n.id})"><i data-lucide="edit-3" size="18"></i></button>
+                        <button class="act-icon" onclick="copyNote(\`${n.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)"><i data-lucide="copy" size="18"></i></button>
+                        <button class="act-icon del" onclick="deleteNote(${n.id})"><i data-lucide="trash-2" size="18"></i></button>
+                    </div>
+                    <div class="note-content">${n.content}</div>
+                    <div class="note-date">${n.date}</div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
 
-    editId = id;
-    const ta = document.getElementById("note-txt");
-    ta.value = item.content;
-    autoResize(ta);
+        function editNote(id) {
+            const n = notes.find(x => x.id === id);
+            editingId = id; 
+            document.getElementById('noteInput').value = n.content;
+            document.getElementById('btnSave').innerText = 'Update';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
 
-    // Set Chip Kategori
-    currentCategory = item.cat;
-    document.querySelectorAll('.comp-top .chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.cat === item.cat);
-    });
-
-    document.getElementById("save-btn").textContent = "Update";
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function renderLogs() {
-    const db = getDB();
-    const container = document.getElementById("logs-list");
-    const query = document.getElementById("search-in").value.toLowerCase();
-
-    let items = currentFilter === "All" ? db : db.filter(item => item.cat === currentFilter);
-    if (query) items = items.filter(item => item.content.toLowerCase().includes(query));
-
-    container.innerHTML = items.map((item, idx) => `
-        <div class="note-card" id="note-${item.id}" style="animation-delay: ${idx * 0.05}s">
-            <div class="note-category note-${item.cat.toLowerCase()}">${item.cat}</div>
-            <div class="note-actions">
-                <i class="far fa-edit" onclick="editEntry('${item.id}')"></i>
-                <i class="far fa-copy" onclick="copyEntry('${item.id}', this)"></i>
-                <i class="far fa-trash-alt" onclick="deleteEntry('${item.id}')" style="color:var(--secret)"></i>
-            </div>
-            <div class="note-text">${item.content.replace(/\n/g, '<br>')}</div>
-            <div class="note-time" style="font-size:12px; color:var(--muted)">${item.time}</div>
-        </div>
-    `).join("");
-}
-
-function deleteEntry(id) {
-    if (!confirm("Hapus permanen?")) return;
-    const card = document.getElementById(`note-${id}`);
-    card.style.animation = "slideOutRight 0.3s forwards";
-    setTimeout(() => {
-        saveDB(getDB().filter(x => x.id !== id));
-        renderLogs(); updateCounters();
-    }, 300);
-}
-
-function copyEntry(id, iconEl) {
-    const item = getDB().find(x => x.id === id);
-    navigator.clipboard.writeText(item.content).then(() => {
-        iconEl.className = "fas fa-check";
-        toast("Disalin");
-        setTimeout(() => iconEl.className = "far fa-copy", 1500);
-    });
-}
-
-function setFilter(el) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    currentFilter = el.dataset.f;
-    renderLogs();
-}
-
-function updateCounters() { document.getElementById('count-all').textContent = getDB().length; }
-
-function toast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg; t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2000);
-}
-
-function showStats() {
-    const modal = document.getElementById("stats-modal");
-    document.getElementById("stat-total").textContent = getDB().length;
-    const size = new Blob([localStorage.getItem(DB_NAME) || ""]).size;
-    document.getElementById("stat-size").textContent = (size / 1024).toFixed(1) + " KB";
-    modal.style.display = "flex";
-}
-
-function closeStats() { document.getElementById("stats-modal").style.display = "none"; }
-
-function exportData() {
-    const db = getDB();
-    const blob = new Blob([JSON.stringify(db, null, 2)], {type: "application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `backup_${Date.now()}.json`;
-    a.click();
-}
-
-function importData(e) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        saveDB(JSON.parse(ev.target.result));
-        renderLogs(); updateCounters(); toast("Restorasi Berhasil");
-    };
-    reader.readAsText(e.target.files[0]);
-}
-
-function clearAll() {
-    if (confirm("Hapus SEMUA data?")) {
-        localStorage.removeItem(DB_NAME);
-        renderLogs(); updateCounters(); closeStats();
-    }
-}
-
-window.onload = () => { renderLogs(); updateCounters(); };
-</script>
+        function copyNote(t) { navigator.clipboard.writeText(t); alert('Copied!'); }
+        function deleteNote(id) { if(confirm('Hapus?')) { notes = notes.filter(n => n.id !== id); saveToStorage(); renderNotes(); } }
+        function saveToStorage() { localStorage.setItem('notes_db', JSON.stringify(notes)); }
+        function backupData() {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(notes)], {type:'application/json'}));
+            a.download = `notes_backup.json`; a.click();
+        }
+        function restoreData(e) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { 
+                try { notes = JSON.parse(ev.target.result); saveToStorage(); renderNotes(); alert('Success!'); } 
+                catch(e) { alert('Error!'); }
+            };
+            reader.readAsText(e.target.files[0]);
+        }
+        renderNotes();
+    </script>
 </body>
 </html>
