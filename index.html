@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyNotes Pro - Fixed</title>
+    <title>MyNotes Pro - Enhanced</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -13,14 +13,14 @@
             --text-main: #ffffff;
             --text-dim: #a1a1aa;
             --border: #27272a;
-            --danger-red: #b91c1c; 
+            /* Update to a brighter red */
+            --danger-red: #ff453a; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-body); color: var(--text-main); padding: 15px; }
+        body { background: var(--bg-body); color: var(--text-main); padding: 15px; overflow-x: hidden; }
         .container { max-width: 450px; margin: 0 auto; }
 
-        /* --- FIX HEADER --- */
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px; }
         .logo { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         .head-btns { display: flex; gap: 8px; }
@@ -28,22 +28,20 @@
         .icon-btn-head { 
             background: #1a1a1a; border: 1px solid var(--border); width: 40px; height: 40px; 
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            color: white; cursor: pointer; position: relative; overflow: hidden;
-            transition: 0.2s;
+            color: white; cursor: pointer; position: relative; transition: 0.2s;
         }
-        .icon-btn-head input { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .icon-btn-head:active { transform: scale(0.9); background: #222; }
+        .icon-btn-head input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .icon-btn-head:active { transform: scale(0.9); }
 
-        /* INPUT CARD */
         .input-card { 
             background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 25px; 
-            border: 2px solid var(--accent); transition: 0.3s;
+            border: 2px solid var(--accent);
         }
         
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
         .tab-btn { 
             background: #262626; border: none; color: #888; padding: 8px 18px; 
-            border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+            border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
         }
         .tab-btn.active { background: var(--accent); color: white; }
 
@@ -53,48 +51,69 @@
         }
         
         .input-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 10px;}
-        .char-hint { font-size: 12px; color: #555; }
         .save-btn { background: var(--accent); color: white; border: none; padding: 10px 28px; border-radius: 22px; font-weight: 700; cursor: pointer; }
 
-        /* SEARCH BOX */
         .search-box { 
             background: var(--bg-card); border-radius: 18px; display: flex; align-items: center; 
-            padding: 0 15px; margin-bottom: 20px; border: 1px solid var(--accent); /* Warna biru biar sinkron */
+            padding: 0 15px; margin-bottom: 20px; border: 1px solid var(--border);
         }
-        .search-input { flex: 1; background: transparent; border: none; padding: 14px 0; color: white; outline: none; margin-left: 10px; font-size: 15px; }
+        .search-input { flex: 1; background: transparent; border: none; padding: 14px 0; color: white; outline: none; margin-left: 10px; }
         
-        /* FILTER BAR */
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
         .pill { 
             background: #1a1a1a; border: 1px solid var(--border); color: var(--text-dim); 
-            padding: 10px 22px; border-radius: 25px; white-space: nowrap; font-size: 14px; font-weight: 600; 
+            padding: 8px 20px; border-radius: 25px; white-space: nowrap; cursor: pointer;
         }
-        .pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .pill.active { background: var(--accent); color: white; }
 
-        /* LIST NOTE ANIMATION */
+        /* ANIMASI */
         .note-item { 
-            background: var(--bg-card); border-radius: 22px; padding: 20px; margin-bottom: 15px; border: 1px solid var(--border);
-            position: relative; animation: slideUp 0.4s ease-out forwards;
+            background: var(--bg-card); border-radius: 22px; padding: 20px; margin-bottom: 15px; 
+            border: 1px solid var(--border); position: relative;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            animation: slideIn 0.4s ease-out forwards;
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* EFEK GESER KIRI SAAT HAPUS */
+        .note-item.removing {
+            transform: translateX(-120%);
+            opacity: 0;
+        }
 
         .badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
-        .note-content { font-size: 18px; color: #fff; font-weight: 500; line-height: 1.4; }
-        .note-date { font-size: 12px; color: #444; margin-top: 12px; }
+        .note-content { font-size: 17px; color: #fff; line-height: 1.5; word-wrap: break-word; }
+        .note-date { font-size: 11px; color: #555; margin-top: 12px; }
 
-        .note-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 15px; }
-        .act-icon { color: #666; cursor: pointer; background: none; border: none; }
+        .note-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 12px; }
+        .act-icon { color: #666; cursor: pointer; background: none; border: none; transition: 0.2s; }
+        .act-icon:active { transform: scale(0.8); }
+        /* Target the delete button specifically to be bright red */
         .act-icon.del { color: var(--danger-red); }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: white; padding: 10px 20px;
+            border-radius: 30px; font-size: 14px; font-weight: 600;
+            display: none; z-index: 100;
+        }
     </style>
 </head>
 <body>
+
+    <div id="toast">Copied to clipboard!</div>
 
     <div class="container">
         <header>
             <div class="logo">MyNotes</div>
             <div class="head-btns">
-                <button class="icon-btn-head" onclick="backupData()"><i data-lucide="upload-cloud" size="20"></i></button>
-                <div class="icon-btn-head">
+                <button class="icon-btn-head" onclick="backupData()" title="Backup"><i data-lucide="upload-cloud" size="20"></i></button>
+                <div class="icon-btn-head" title="Restore">
                     <i data-lucide="download-cloud" size="20"></i>
                     <input type="file" onchange="restoreData(event)">
                 </div>
@@ -107,7 +126,7 @@
                 <button class="tab-btn" onclick="setCategory(this, 'Work')">Work</button>
                 <button class="tab-btn" onclick="setCategory(this, 'Secret')">Secret</button>
             </div>
-            <textarea id="noteInput" placeholder="Ketik sesuatu..."></textarea>
+            <textarea id="noteInput" placeholder="Tulis rencana lo hari ini..."></textarea>
             <div class="input-footer">
                 <span class="char-hint" id="charCount">0 karakter</span>
                 <button class="save-btn" onclick="saveNote()" id="btnSave">Simpan</button>
@@ -116,11 +135,11 @@
 
         <div class="search-box">
             <i data-lucide="search" size="18" color="#555"></i>
-            <input type="text" class="search-input" id="searchBar" placeholder="Cari data..." oninput="renderNotes()">
+            <input type="text" class="search-input" id="searchBar" placeholder="Cari catatan..." oninput="renderNotes()">
         </div>
 
         <div class="filter-bar" id="filterBar">
-            <div class="pill active" onclick="setFilter('Semua')">Semua <span id="countAll" style="font-size:11px; opacity:0.7">0</span></div>
+            <div class="pill active" onclick="setFilter('Semua')">Semua <span id="countAll">0</span></div>
             <div class="pill" onclick="setFilter('Personal')">Personal</div>
             <div class="pill" onclick="setFilter('Work')">Work</div>
             <div class="pill" onclick="setFilter('Secret')">Secret</div>
@@ -136,6 +155,7 @@
         let editingId = null;
 
         lucide.createIcons();
+
         document.getElementById('noteInput').oninput = function() {
             document.getElementById('charCount').innerText = `${this.value.length} karakter`;
         };
@@ -149,14 +169,17 @@
         function setFilter(f) {
             currentFilter = f;
             document.querySelectorAll('#filterBar .pill').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText.includes(f));
+                const text = btn.innerText.split(' ')[0];
+                btn.classList.toggle('active', text === f);
             });
             renderNotes();
         }
 
         function saveNote() {
-            const content = document.getElementById('noteInput').value.trim();
+            const input = document.getElementById('noteInput');
+            const content = input.value.trim();
             if (!content) return;
+
             if (editingId) {
                 const idx = notes.findIndex(n => n.id === editingId);
                 notes[idx].content = content;
@@ -165,12 +188,14 @@
                 document.getElementById('btnSave').innerText = 'Simpan';
             } else {
                 const now = new Date();
-                const timeStr = now.toLocaleDateString('id-ID', {day:'numeric', month:'short'}) + `, ${now.getHours()}.${now.getMinutes().toString().padStart(2,'0')}`;
+                const timeStr = now.toLocaleDateString('id-ID', {day:'numeric', month:'short'}) + `, ${now.getHours().toString().padStart(2,'0')}.${now.getMinutes().toString().padStart(2,'0')}`;
                 notes.push({ id: Date.now(), content, category: currentCategory, date: timeStr });
             }
-            document.getElementById('noteInput').value = '';
+            
+            input.value = '';
             document.getElementById('charCount').innerText = '0 karakter';
-            saveToStorage(); renderNotes();
+            saveToStorage(); 
+            renderNotes();
         }
 
         function renderNotes() {
@@ -184,18 +209,21 @@
             }).reverse();
 
             list.innerHTML = filtered.map(n => {
-                const badgeColor = n.category === 'Personal' ? '#2d1b4e' : (n.category === 'Work' ? '#3e2b0e' : '#3e1616');
-                const textColor = n.category === 'Personal' ? '#a78bfa' : (n.category === 'Work' ? '#fbbf24' : '#f87171');
+                const config = {
+                    Personal: { bg: '#2d1b4e', txt: '#a78bfa' },
+                    Work: { bg: '#3e2b0e', txt: '#fbbf24' },
+                    Secret: { bg: '#3e1616', txt: '#f87171' }
+                }[n.category];
                 
                 return `
-                <div class="note-item">
-                    <span class="badge" style="background:${badgeColor}; color:${textColor}">${n.category}</span>
+                <div class="note-item" id="note-${n.id}">
+                    <span class="badge" style="background:${config.bg}; color:${config.txt}">${n.category}</span>
                     <div class="note-actions">
                         <button class="act-icon" onclick="editNote(${n.id})"><i data-lucide="edit-3" size="18"></i></button>
-                        <button class="act-icon" onclick="copyNote(\`${n.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)"><i data-lucide="copy" size="18"></i></button>
-                        <button class="act-icon del" onclick="deleteNote(${n.id})"><i data-lucide="trash-2" size="18"></i></button>
+                        <button class="act-icon" onclick="copyNote(${n.id})"><i data-lucide="copy" size="18"></i></button>
+                        <button class="act-icon del" onclick="confirmDelete(${n.id})"><i data-lucide="trash-2" size="18"></i></button>
                     </div>
-                    <div class="note-content">${n.content}</div>
+                    <div class="note-content">${n.content.replace(/\n/g, '<br>')}</div>
                     <div class="note-date">${n.date}</div>
                 </div>`;
             }).join('');
@@ -205,27 +233,64 @@
         function editNote(id) {
             const n = notes.find(x => x.id === id);
             editingId = id; 
-            document.getElementById('noteInput').value = n.content;
+            const input = document.getElementById('noteInput');
+            input.value = n.content;
+            input.focus();
             document.getElementById('btnSave').innerText = 'Update';
             window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            // Sync category tab
+            const tabs = document.querySelectorAll('#inputTabs .tab-btn');
+            tabs.forEach(t => {
+                if(t.innerText === n.category) setCategory(t, n.category);
+            });
         }
 
-        function copyNote(t) { navigator.clipboard.writeText(t); alert('Copied!'); }
-        function deleteNote(id) { if(confirm('Hapus?')) { notes = notes.filter(n => n.id !== id); saveToStorage(); renderNotes(); } }
-        function saveToStorage() { localStorage.setItem('notes_db', JSON.stringify(notes)); }
-        function backupData() {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(notes)], {type:'application/json'}));
-            a.download = `notes_backup.json`; a.click();
+        function copyNote(id) {
+            const n = notes.find(x => x.id === id);
+            navigator.clipboard.writeText(n.content);
+            const t = document.getElementById('toast');
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
         }
+
+        function confirmDelete(id) {
+            const el = document.getElementById(`note-${id}`);
+            el.classList.add('removing'); // Triggers slide-left animation
+            
+            setTimeout(() => {
+                notes = notes.filter(n => n.id !== id);
+                saveToStorage();
+                renderNotes();
+            }, 400); // Sesuai durasi transisi CSS
+        }
+
+        function saveToStorage() { localStorage.setItem('notes_db', JSON.stringify(notes)); }
+        
+        function backupData() {
+            const blob = new Blob([JSON.stringify(notes)], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_notes_${new Date().getTime()}.json`;
+            a.click();
+        }
+
         function restoreData(e) {
             const reader = new FileReader();
             reader.onload = (ev) => { 
-                try { notes = JSON.parse(ev.target.result); saveToStorage(); renderNotes(); alert('Success!'); } 
-                catch(e) { alert('Error!'); }
+                try { 
+                    const data = JSON.parse(ev.target.result);
+                    if(Array.isArray(data)) {
+                        notes = data;
+                        saveToStorage(); renderNotes();
+                        alert('Data berhasil di-restore!');
+                    }
+                } catch(err) { alert('File gak valid!'); }
             };
             reader.readAsText(e.target.files[0]);
         }
+
         renderNotes();
     </script>
 </body>
